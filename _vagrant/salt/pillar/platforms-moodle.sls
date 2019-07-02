@@ -135,7 +135,7 @@ platforms:
     moodle:
       dbtype: pgsql
       dblibrary: native
-      dbhost: 192.168.120.150
+      dbhost: 192.168.120.40
       dbname: vagrant
       dbuser: vagrant
       dbpass: gibberish
@@ -145,6 +145,22 @@ platforms:
         dbport: 5432
       dataroot: /home/vagrant/data/base
       directorypermissions: '0777'
-      wwwroot: http://192.168.120.50
+      wwwroot: http://192.168.120.80
       sslproxy: false
       admin: admin
+      use_alternative_component_cache: True
+      pre_bootstrap: |
+        {% raw %}
+        $CFG->alternative_component_cache = '{{ release.dir }}/config.components.php';
+        {% endraw %}
+
+nfs:
+  common:
+    default:
+      NEED_IDMAPD: 'yes'
+  imports:
+    vagrant:
+      mountpoint: /home/vagrant/data/base
+      mountpoint_user: vagrant
+      mountpoint_group: vagrant
+      device: 192.168.120.75:vagrant

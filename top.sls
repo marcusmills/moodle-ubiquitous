@@ -47,6 +47,20 @@ base:
     - match: grain
     - moodle-ci
 
+  'roles:drbd':
+    - match: grain
+    - drbd
+  'roles:pacemaker':
+    - match: grain
+    - pacemaker
+
+  'roles:nfs.client':
+    - match: grain
+    - nfs.client
+  'roles:nfs.server':
+    - match: grain
+    - nfs.server
+
   'roles:nvm':
     - match: grain
     - nvm
