@@ -60,9 +60,6 @@ base:
   'roles:nfs.server':
     - match: grain
     - nfs.server
-  'roles:tcpwrappers':
-    - match: grain
-    - tcpwrappers
 
   'roles:nvm':
     - match: grain

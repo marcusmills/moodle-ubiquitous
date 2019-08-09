@@ -148,6 +148,11 @@ platforms:
       wwwroot: http://192.168.120.80
       sslproxy: false
       admin: admin
+      use_alternative_component_cache: True
+      pre_bootstrap: |
+        {% raw %}
+        $CFG->alternative_component_cache = '{{ release.dir }}/config.components.php';
+        {% endraw %}
 
 nfs:
   common:
