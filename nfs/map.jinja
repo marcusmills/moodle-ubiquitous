@@ -1,0 +1,34 @@
+{%
+  set nfs = salt['grains.filter_by']({
+    'default': {
+      'common_packages': [
+        'nfs-common',
+      ],
+      'client_packages': [
+      ],
+      'server_packages': [
+        'nfs-kernel-server',
+      ],
+      'common': {
+        'default': {
+          'STATDOPTS': '',
+          'NEED_GSSD': '',
+        },
+      },
+      'kernel_server': {
+        'default': {
+          'RPCNFSDCOUNT': 8,
+          'RPCNFSDPRIORITY': 0,
+          'RPCMOUNTDOPTS': '--manage-gids',
+          'NEED_SVCGSSD': 'no',
+          'RPCSVCGSSDOPTS': '',
+        },
+      },
+      'modprobe': {},
+      'sysctl': {
+        'priority': 50,
+        'parameters': {},
+      },
+    },
+  }, grain='osrelease', merge=salt['pillar.get']('nfs'))
+%}
