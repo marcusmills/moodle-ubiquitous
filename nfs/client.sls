@@ -11,8 +11,11 @@ nfs.client.pkgs:
 nfs.client.dir.{{ basename }}:
   file.directory:
     - name: {{ mount.mountpoint }}
+<<<<<<< HEAD
     - user: {{ mount.mountpoint_user }}
     - group: {{ mount.mountpoint_group }}
+=======
+>>>>>>> 8bde0ea9ef50e962d580bd9e03b594e7b91fa2bc
     - makedirs: True
 
 nfs.client.mount.{{ basename }}:

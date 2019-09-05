@@ -7,7 +7,11 @@ nfs.server.pkgs:
   pkg.latest:
     - pkgs: {{ nfs.server_packages | yaml }}
 
+<<<<<<< HEAD
 # managed by pacemaker
+=======
+# Managed by pacemaker
+>>>>>>> 8bde0ea9ef50e962d580bd9e03b594e7b91fa2bc
 nfs.server.kernel-server.service:
   service.disabled:
     - name: nfs-kernel-server
@@ -23,6 +27,7 @@ nfs.server.default.kernel-server:
     - group: root
     - mode: 0644
 
+<<<<<<< HEAD
 nfs.server.modprobe:
   file.managed:
     - name: /etc/modprobe.d/ubiquitous-nfs.conf
@@ -34,6 +39,8 @@ nfs.server.modprobe:
     - group: root
     - mode: 0644
 
+=======
+>>>>>>> 8bde0ea9ef50e962d580bd9e03b594e7b91fa2bc
 {% for name, value in nfs.sysctl.parameters.items() %}
 nfs.server.sysctl.value.{{ name }}:
   sysctl.present:

@@ -48,6 +48,25 @@ base:
     - moodle-ci
 
   'roles:drbd':
+<<<<<<< HEAD
+=======
+    - match: grain
+    - drbd
+  'roles:lvm':
+    - match: grain
+    - lvm
+  'roles:pacemaker':
+    - match: grain
+    - pacemaker
+
+  'roles:nfs.client':
+    - match: grain
+    - nfs.client
+  'roles:nfs.server':
+    - match: grain
+    - nfs.server
+  'roles:tcpwrappers':
+>>>>>>> 8bde0ea9ef50e962d580bd9e03b594e7b91fa2bc
     - match: grain
     - drbd
   'roles:pacemaker':

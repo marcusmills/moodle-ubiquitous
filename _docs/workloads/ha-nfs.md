@@ -68,13 +68,22 @@ $ sudo parted /dev/vda mkpart primary 0% 100%
 
 ### LVM on DRBD
 
+<<<<<<< HEAD
 If you're using DBRD to replicate physical volumes we now need to configure DRBD to replicate this partition using a pillar configuration such as:
+=======
+If you're using DBRD to replicate physical volumes we now need to configure DRBD to replicate the partition containing the LVM PV using a pillar configuration such as:
+>>>>>>> 8bde0ea9ef50e962d580bd9e03b594e7b91fa2bc
 
 ```yaml
 drbd:
   drbd.d:
+<<<<<<< HEAD
     export-data-vda1: |
       resource export-data-vda1 {
+=======
+    export-data-vda: |
+      resource export-data-vda {
+>>>>>>> 8bde0ea9ef50e962d580bd9e03b594e7b91fa2bc
         protocol C;
         disk {
           on-io-error detach;
@@ -97,8 +106,19 @@ drbd:
 We then need to create to the DRBD metadata and bring up the volume:
 
 ```
+<<<<<<< HEAD
 $ sudo drbdadm create-md export-data-vda1
 $ sudo drbdadm up export-data-vda1
+=======
+$ sudo drbdadm create-md export-data-vda
+$ sudo drbdadm up export-data-vda
+```
+
+Then make _one_ of the nodes the primary:
+
+```
+$ sudo drbdadm primary --force export-data-vda
+>>>>>>> 8bde0ea9ef50e962d580bd9e03b594e7b91fa2bc
 ```
 
 On the primary, we can now initialise the LVM physical volume on the newly created DRBD device, which DRBD should replicate to the secondary:
@@ -110,15 +130,28 @@ $ sudo pvcreate /dev/drbd0
 If creating the logical volume for the first time, we must prepare the LVM volume group and logical volume:
 
 ```
+<<<<<<< HEAD
 $ sudo vgcreate storage-exports /dev/drbd0
 $ sudo lvcreate -l 100%FREE -n data storage-exports
+=======
+$ sudo vgcreate --addtag pacemaker storage-exports /dev/drbd0
+$ sudo lvcreate -l 100%FREE -n data \
+        --config 'activation/volume_list = ["storage-exports"]' \
+        storage-exports
+>>>>>>> 8bde0ea9ef50e962d580bd9e03b594e7b91fa2bc
 ```
 
 Otherwise we can extend an existing logical volume:
 
 ```
 $ sudo vgextend storage-exports /dev/drbd0
+<<<<<<< HEAD
 $ sudo lvextend storage-exports/data /dev/drbd0
+=======
+$ sudo lvextend \
+        --config 'activation/volume_list = ["storage-exports"]' \
+        storage-exports/data /dev/drbd0
+>>>>>>> 8bde0ea9ef50e962d580bd9e03b594e7b91fa2bc
 ```
 
 ### DRBD on LVM
@@ -198,10 +231,18 @@ When setting up a new logical volume we'll need to initialise a filesystem on it
 
 ```
 $ sudo mkfs -t ext4 /dev/storage-exports/data
+<<<<<<< HEAD
 $ sudo mkdir /mnt/export-data
 $ sudo mount /dev/storage-exports/data /mnt/export-data
 $ sudo install -d -o vagrant -g root /mnt/export/vagrant
 $ sudo umount /mnt/export
+=======
+$ sudo mkdir /mnt/exports
+$ sudo mount /dev/storage-exports/data /mnt/exports
+$ sudo install -d -o vagrant -g root /mnt/exports/vagrant
+$ sudo umount /mnt/exports
+$ sudo rm -rf /mnt/exports
+>>>>>>> 8bde0ea9ef50e962d580bd9e03b594e7b91fa2bc
 ```
 
 ## Extending the filesystem
@@ -274,7 +315,11 @@ disks=(
     vda
 )
 platforms=(
+<<<<<<< HEAD
     vagrant
+=======
+    1:vagrant
+>>>>>>> 8bde0ea9ef50e962d580bd9e03b594e7b91fa2bc
 )
 
 echo 'Exporting the current CIB for editing'
@@ -305,7 +350,11 @@ sudo pcs -f "$cib" resource create export-data-lvm ocf:heartbeat:LVM \
 echo 'Defining the filesystem'
 sudo pcs -f "$cib" resource create export-data-filesystem ocf:heartbeat:Filesystem \
         device="/dev/storage-exports/data" \
+<<<<<<< HEAD
         directory="/mnt/export" \
+=======
+        directory="/mnt/exports" \
+>>>>>>> 8bde0ea9ef50e962d580bd9e03b594e7b91fa2bc
         fstype="ext4"
 
 echo 'Defining the floating IP'
@@ -314,11 +363,19 @@ sudo pcs -f "$cib" resource create export-data-ip ocf:heartbeat:IPaddr2 \
 
 echo 'Defining the NFS service'
 sudo pcs -f "$cib" resource create export-data-nfs ocf:heartbeat:nfsserver \
+<<<<<<< HEAD
         nfs_shared_infodir=/mnt/export/nfsinfo
 
 echo 'Defining the virtual root export'
 sudo pcs -f "$cib" resource create export-data-root ocf:heartbeat:exportfs \
         fsid="0" directory="/mnt/export" \
+=======
+        nfs_shared_infodir=/mnt/exports/nfsinfo
+
+echo 'Defining the virtual root export'
+sudo pcs -f "$cib" resource create export-data-root ocf:heartbeat:exportfs \
+        fsid="0" directory="/mnt/exports" \
+>>>>>>> 8bde0ea9ef50e962d580bd9e03b594e7b91fa2bc
         options="rw,crossmnt" clientspec="$nfs_clientspec"  \
         op monitor interval="60s"
 
@@ -327,7 +384,11 @@ for platform in "${platforms[@]}"; do
     fsid="$(echo "$platform" | cut -d: -f1)"
     name="$(echo "$platform" | cut -d: -f2)"
     sudo pcs -f "$cib" resource create "export-data-share-${name}" ocf:heartbeat:exportfs \
+<<<<<<< HEAD
             fsid="$fsid" directory="/mnt/export/${name}" \
+=======
+            fsid="$fsid" directory="/mnt/exports/${name}" \
+>>>>>>> 8bde0ea9ef50e962d580bd9e03b594e7b91fa2bc
             options="rw,mountpoint" clientspec="$nfs_clientspec" \
             wait_for_leasetime_on_stop="true" \
             op monitor interval="60s"
@@ -336,6 +397,10 @@ done
 
 echo 'Grouping the resources that should live on the current master'
 sudo pcs -f "$cib" resource group add export-data \
+<<<<<<< HEAD
+=======
+        export-data-lvm \
+>>>>>>> 8bde0ea9ef50e962d580bd9e03b594e7b91fa2bc
         export-data-filesystem \
         export-data-ip \
         export-data-nfs \
@@ -381,7 +446,11 @@ This configuration is similar to the above, but no explicit LVM volume group act
 cib=export-data.cib.xml
 nfs_clientspec="192.168.120.0/255.255.255.0"
 platforms=(
+<<<<<<< HEAD
     vagrant
+=======
+    1:vagrant
+>>>>>>> 8bde0ea9ef50e962d580bd9e03b594e7b91fa2bc
 )
 
 echo 'Exporting the current CIB for editing'
@@ -405,7 +474,11 @@ sudo pcs -f "$cib" resource master export-data-election export-data-disk \
 echo 'Defining the filesystem'
 sudo pcs -f "$cib" resource create export-data-filesystem ocf:heartbeat:Filesystem \
         device="/dev/drbd0" \
+<<<<<<< HEAD
         directory="/mnt/export" \
+=======
+        directory="/mnt/exports" \
+>>>>>>> 8bde0ea9ef50e962d580bd9e03b594e7b91fa2bc
         fstype="xfs"
 
 echo 'Defining the floating IP'
@@ -414,11 +487,19 @@ sudo pcs -f "$cib" resource create export-data-ip ocf:heartbeat:IPaddr2 \
 
 echo 'Defining the NFS service'
 sudo pcs -f "$cib" resource create export-data-nfs ocf:heartbeat:nfsserver \
+<<<<<<< HEAD
         nfs_shared_infodir=/mnt/export/nfsinfo
 
 echo 'Defining the virtual root export'
 sudo pcs -f "$cib" resource create export-data-root ocf:heartbeat:exportfs \
         fsid="0" directory="/mnt/export" \
+=======
+        nfs_shared_infodir=/mnt/exports/nfsinfo
+
+echo 'Defining the virtual root export'
+sudo pcs -f "$cib" resource create export-data-root ocf:heartbeat:exportfs \
+        fsid="0" directory="/mnt/exports" \
+>>>>>>> 8bde0ea9ef50e962d580bd9e03b594e7b91fa2bc
         options="rw,crossmnt" clientspec="$nfs_clientspec"  \
         op monitor interval="60s"
 
@@ -427,7 +508,11 @@ for platform in "${platforms[@]}"; do
     fsid="$(echo "$platform" | cut -d: -f1)"
     name="$(echo "$platform" | cut -d: -f2)"
     sudo pcs -f "$cib" resource create "export-data-share-${name}" ocf:heartbeat:exportfs \
+<<<<<<< HEAD
             fsid="$fsid" directory="/mnt/export/${name}" \
+=======
+            fsid="$fsid" directory="/mnt/exports/${name}" \
+>>>>>>> 8bde0ea9ef50e962d580bd9e03b594e7b91fa2bc
             options="rw,mountpoint" clientspec="$nfs_clientspec" \
             wait_for_leasetime_on_stop="true" \
             op monitor interval="60s"

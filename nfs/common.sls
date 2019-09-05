@@ -16,3 +16,28 @@ nfs.common.default.common:
     - mode: 0644
     - require:
       - pkg: nfs.common.pkgs
+<<<<<<< HEAD
+=======
+
+nfs.common.idmapd.conf:
+  file.managed:
+    - name: /etc/idmapd.conf
+    - source: salt://nfs/ini/ini.jinja
+    - template: jinja
+    - context:
+      values: {{ nfs.idmapd | yaml }}
+    - user: root
+    - group: root
+    - mode: 0644
+
+nfs.common.modprobe:
+  file.managed:
+    - name: /etc/modprobe.d/ubiquitous-nfs.conf
+    - source: salt://nfs/modprobe/modprobe.conf.jinja
+    - template: jinja
+    - context:
+      values: {{ nfs.modprobe | yaml }}
+    - user: root
+    - group: root
+    - mode: 0644
+>>>>>>> 8bde0ea9ef50e962d580bd9e03b594e7b91fa2bc
